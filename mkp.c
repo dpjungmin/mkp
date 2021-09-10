@@ -60,13 +60,13 @@ int mkp(int fd, char *fname, int flags)
 {
         int fd2, mkp_create = flags & MKP_CREATE;
 
-        if (!mkp_create && (fd2 = open(fname, O_WRONLY)) != -1) {
+        if (!mkp_create && (fd2 = open(fname, O_WRONLY, S_IRUSR | S_IWUSR)) != -1) {
                 fprintf(stderr, "\"%s\" already exists\n", fname);
                 close(fd2);
                 return(-1);
         }
 
-        if ((fd2 = open(fname, O_WRONLY | O_CREAT)) == -1) {
+        if ((fd2 = open(fname, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR)) == -1) {
                 fprintf(stderr, "Failed to open \"%s\"\n", fname);
                 return(-1);
         }
@@ -82,6 +82,7 @@ int mkp(int fd, char *fname, int flags)
                 return(-1);
         }
 
+        printf("Created \"%s\"\n", fname);
         close(fd2);
         return(0);
 }
