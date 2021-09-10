@@ -1,6 +1,6 @@
-CC 			= gcc
-CFLAGS 	= -Wall -g
-TARGET 	= mkp
+CC = gcc
+CFLAGS = -Wall -g
+TARGET = mkp
 
 all: $(TARGET)
 
