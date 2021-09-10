@@ -6,22 +6,15 @@
 int main(int argc, char *argv[])
 {
         char prog[MAX_PATH_LENGTH];
-        char *template;
-        FILE *fp;
+        char template[MAX_PATH_LENGTH];
+        FILE *fp = NULL;
 
         set_prog(prog, *argv);
-
-        if ((template = getenv(TEMPLATE)) == NULL)
-                template = DEFAULT_TEMPLATE;
-
-        if ((fp = fopen(template, "r")) == NULL) {
-                char msg[MAX_MSG_LENGTH];
-                sprintf(msg, "Failed to open \"%s\"", template);
-                perror(msg);
-                exit(EXIT_FAILURE);
-        }
+        set_template(template);
+        open_template(fp, template);
 
         while (--argc) {
+                /* TODO: spawn threads to call mkp */
                 mkp(fp, *++argv);
         }
 }
