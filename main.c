@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include "mkp.h"
 
 /*
@@ -17,4 +19,7 @@ int main(int argc, char *argv[])
 
         while (--argc)
                 (void)mkp(fd, *++argv, MKP_DEFAULT);
+
+        close(fd);
+        return(0);
 }
