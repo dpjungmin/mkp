@@ -6,7 +6,7 @@
 
 #include "mkp.h"
 
-int __fcpy(int to, int from)
+static int __fcpy(int to, int from)
 {
         int n;
         char buf[MAX_BUF_SIZE];
