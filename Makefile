@@ -13,5 +13,11 @@ mkp.o: mkp.c
 main.o: main.c
 	$(CC) $(CFLAGS) -c $^
 
+test: tests.o
+	$(CC) $(CFLAGS) -o $@ $^
+
+tests.o: tests.c
+	$(CC) $(CFLAGS) -c $^
+
 clean:
-	rm -f *.o *.so $(TARGET)
+	rm -f *.o *.so $(TARGET) test
