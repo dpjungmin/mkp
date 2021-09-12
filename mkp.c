@@ -6,29 +6,40 @@
 
 #include "mkp.h"
 
-static int __fcpy(int to, int from)
+static inline int __fcpy(int to, int from)
 {
         int n;
         char buf[MAX_BUF_SIZE];
 
         while ((n = read(from, buf, sizeof(buf))) > 0)
                 if (write(to, buf, n) != n)
-                        return(-1);
+                        return -1;
 
-        return(0);
+        return 0;
 }
 
-void set_template(char *template)
+void usage(int status)
 {
-        char *env;
-
-        if ((env = getenv(TEMPLATE_ENV)) == NULL)
-                env = TEMPLATE_DEFAULT;
-
-        strncpy(template, env, strlen(env));
+        printf("Usage: %s filename(s)\n", PROGRAM_NAME);
+        printf("   or: %s [options]\n\n", PROGRAM_NAME);
+        printf("     --help     display this help and exit\n");
+        printf("     --version  output version information and exit\n");
+        exit(status);
 }
 
-int open_template(char *template)
+void version(int status)
+{
+        printf("%s version %s\n", PROGRAM_NAME, VERSION);
+        exit(status);
+}
+
+void set_template(char **template)
+{
+        if ((*template = getenv(TEMPLATE_ENV)) == NULL)
+                *template = TEMPLATE_DEFAULT;
+}
+
+int open_template(const char *template)
 {
         int fd;
 
@@ -53,12 +64,12 @@ int mkp(int fd, char *fname, int flags)
         if (!mkp_create && (fd2 = open(fname, O_WRONLY, S_IRUSR | S_IWUSR)) != -1) {
                 fprintf(stderr, "\"%s\" already exists\n", fname);
                 close(fd2);
-                return(-1);
+                return -1;
         }
 
         if ((fd2 = open(fname, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR)) == -1) {
                 fprintf(stderr, "Failed to open \"%s\"\n", fname);
-                return(-1);
+                return -1;
         }
 
         if (lseek(fd, (off_t)0, SEEK_SET) == -1) {
@@ -69,11 +80,11 @@ int mkp(int fd, char *fname, int flags)
         if (__fcpy(fd2, fd) == -1) {
                 fprintf(stderr, "Failed to copy \"%s\"\n", fname);
                 close(fd2);
-                return(-1);
+                return -1;
         }
 
         printf("Created \"%s\"\n", fname);
         close(fd2);
-        return(0);
+        return 0;
 }
 
