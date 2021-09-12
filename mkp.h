@@ -29,6 +29,6 @@ void usage(int status);
 void version(int status);
 void set_template(char **template);
 int open_template(const char *template);
-int mkp(int fd, char *fname, int flag);
+int mkp(int fd, char *fname, int flags);
 
 #endif
