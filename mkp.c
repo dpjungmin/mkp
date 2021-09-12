@@ -18,16 +18,6 @@ static int __fcpy(int to, int from)
         return(0);
 }
 
-void set_prog(char *prog, const char *str)
-{
-        char *ptr = NULL;
-
-        if ((ptr = strrchr(str, DIR_SEP)) != NULL)
-                strcpy(prog, ++ptr);
-        else
-                strcpy(prog, str);
-}
-
 void set_template(char *template)
 {
         char *env;

@@ -10,6 +10,7 @@
         #define DIR_SEP   '/'
 #endif
 
+#define PROGRAM_NAME      "mkp"
 #define TEMPLATE_ENV      "MKP_TEMPLATE"
 #define TEMPLATE_DEFAULT  "./template"
 
