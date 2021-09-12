@@ -44,7 +44,7 @@ int open_template(const char *template)
         int fd;
 
         if ((fd = open(template, O_RDONLY)) == -1) {
-                char msg[MAX_MSG_LENGTH + MAX_PATH_LENGTH];
+                char msg[MAX_MSG_LENGTH + strlen(template) + 1];
                 sprintf(msg,"Failed to open \"%s\"", template);
                 perror(msg);
                 fprintf(stderr,

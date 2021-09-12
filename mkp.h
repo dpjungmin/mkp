@@ -18,7 +18,6 @@
 #define TEMPLATE_ENV      "MKP_TEMPLATE"
 #define TEMPLATE_DEFAULT  "./template"
 
-#define MAX_PATH_LENGTH   240
 #define MAX_MSG_LENGTH    120
 #define MAX_BUF_SIZE      1024
 
