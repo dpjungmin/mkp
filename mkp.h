@@ -21,7 +21,6 @@
 #define MKP_DEFAULT       0
 #define MKP_CREATE        1
 
-void set_prog(char *prog, const char *str);
 void set_template(char *template);
 int open_template(char *template);
 int mkp(int fd, char *fname, int flag);
