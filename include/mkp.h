@@ -3,15 +3,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
 
-#define TRUE              0
-#define FALSE             0
-
-#ifdef _WIN32
-        #define DIR_SEP   '\\'
-#else
-        #define DIR_SEP   '/'
-#endif
+#include "util.h"
 
 #define PROGRAM_NAME      "mkp"
 #define VERSION           "0.0.1"
@@ -24,10 +20,10 @@
 #define MKP_DEFAULT       0
 #define MKP_CREATE        1
 
-void usage(int status);
-void version(int status);
-void set_template(char **template);
-int open_template(const char *template);
-int mkp(int fd, char *fname, int flags);
+extern void usage(int status);
+extern void version(int status);
+extern void set_template(char **template);
+extern int open_template(const char *template);
+extern int mkp(int fd, char *fname, int flags);
 
 #endif
