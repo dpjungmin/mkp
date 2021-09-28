@@ -23,7 +23,7 @@
 extern void usage(int status);
 extern void version(int status);
 extern void set_template(char **template);
-extern int open_template(const char *template);
-extern int mkp(int fd, char *fname, int flags);
+extern int  open_template(const char *template);
+extern int  mkp(int fd, char *fname, int flags);
 
 #endif
