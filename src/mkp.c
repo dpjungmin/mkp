@@ -1,5 +1,32 @@
 #include "mkp.h"
 
+args_t args = ARGS_INIT;
+
+static inline void __set_template(char **template)
+{
+        if (args.tfile) {
+                *template = args.tfile;
+                return;
+        }
+        
+        if ((*template = getenv(TEMPLATE_ENV)) == NULL)
+                *template = TEMPLATE_DEFAULT;
+}
+
+static inline void __open_template(int *fd, const char *template)
+{
+        if ((*fd = open(template, O_RDONLY)) == -1) {
+                char msg[MAX_MSG_LENGTH + strlen(template) + 1];
+                sprintf(msg,"Failed to open \"%s\"", template);
+                perror(msg);
+                fprintf(stderr,
+                        "Set an environment variable \"%s\" that points to the template file, or create a file named \"%s\" in the current directory\n",
+                        TEMPLATE_ENV,
+                        TEMPLATE_DEFAULT);
+                exit(EXIT_FAILURE);
+        }
+}
+
 static inline int __fcpy(int to, int from)
 {
         int n;
@@ -10,6 +37,17 @@ static inline int __fcpy(int to, int from)
                         return -1;
 
         return 0;
+}
+
+static inline void __display(const char *fmt, ...)
+{
+        if (!args.printflag)
+                return;
+
+        va_list ap;
+
+        va_start(ap, fmt);
+        vfprintf(stdout, fmt, ap);
 }
 
 void usage(int status)
@@ -27,28 +65,12 @@ void version(int status)
         exit(status);
 }
 
-void set_template(char **template)
+void get_template(int *fd)
 {
-        if ((*template = getenv(TEMPLATE_ENV)) == NULL)
-                *template = TEMPLATE_DEFAULT;
-}
+        char *template;
 
-int open_template(const char *template)
-{
-        int fd;
-
-        if ((fd = open(template, O_RDONLY)) == -1) {
-                char msg[MAX_MSG_LENGTH + strlen(template) + 1];
-                sprintf(msg,"Failed to open \"%s\"", template);
-                perror(msg);
-                fprintf(stderr,
-                        "Set an environment variable %s that points to the template file, or create \"%s\"\n",
-                        TEMPLATE_ENV,
-                        TEMPLATE_DEFAULT);
-                exit(EXIT_FAILURE);
-        }
-
-        return fd;
+        __set_template(&template);
+        __open_template(fd, template);
 }
 
 int mkp(int fd, char *fname, int flags)
@@ -77,7 +99,7 @@ int mkp(int fd, char *fname, int flags)
                 return -1;
         }
 
-        printf("Created \"%s\"\n", fname);
+        __display("Created \"%s\"\n", fname);
         close(fd2);
         return 0;
 }

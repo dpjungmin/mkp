@@ -1,9 +1,12 @@
 #include "mkp.h"
+#include "list.h"
 
 int main(int argc, char **argv)
 {
-        char *template;
-        int fd;
+        int carg, fd, mkp_flags = MKP_DEFAULT;
+        char *fname;
+        DEFINE_LIST(list);
+        extern args_t args;
 
         if (argc == 2) {
                 if (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-h") == 0)
@@ -12,11 +15,33 @@ int main(int argc, char **argv)
                         version(EXIT_SUCCESS);
         }
 
-        set_template(&template);
-        fd = open_template(template);
+        for (carg = 1; carg < argc; carg++) {
+                if (argv[carg][0] == '-') {
+                        switch (argv[carg][1]) {
+                        case 'p':
+                        case 'P':
+                                args.printflag = TRUE;
+                                break;
+                        case 't':
+                        case 'T':
+                                args.tfile = argv[++carg];
+                                break;
+                        case 'o':
+                        case 'O':
+                                mkp_flags |= MKP_CREATE;
+                                break;
+                        default:
+                                break;
+                        }
+                } else {
+                        list_push_back((void *)argv[carg], &list);
+                }
+        }
 
-        while (--argc)
-                (void)mkp(fd, *++argv, MKP_DEFAULT);
+        get_template(&fd);
+
+        while ((fname = list_pop_front(&list)))
+                (void)mkp(fd, fname, mkp_flags);
 
         close(fd);
         return 0;
