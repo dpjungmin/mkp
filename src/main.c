@@ -6,9 +6,9 @@ int main(int argc, char **argv)
         int carg;
         int fd;
         char *fname;
-        pthread_t *thread;
+        pthread_t *job;
         DEFINE_LIST(files);
-        DEFINE_LIST(threads);
+        DEFINE_LIST(jobs);
         int mkp_flags = MKP_DEFAULT;
         extern args_t args;
 
@@ -45,18 +45,18 @@ int main(int argc, char **argv)
         get_template(&fd);
 
         while ((fname = list_pop_front(&files))) {
-                thread = malloc(sizeof(pthread_t));
+                job = malloc(sizeof(pthread_t));
                 struct mkp_args *ma = malloc(sizeof(struct mkp_args));
                 ma->fd = fd;
                 ma->fname = fname;
                 ma->flags = mkp_flags;
-                pthread_create(thread, NULL, mkp, (void *)ma);
-                list_push_back((void *)thread, &threads);
+                pthread_create(job, NULL, mkp, (void *)ma);
+                list_push_back((void *)job, &jobs);
         }
 
-        while ((thread = list_pop_front(&threads))) {
-                pthread_join(*thread, NULL);
-                free(thread);
+        while ((job = list_pop_front(&jobs))) {
+                pthread_join(*job, NULL);
+                free(job);
         }
 
         close(fd);
