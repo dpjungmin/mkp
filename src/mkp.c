@@ -55,8 +55,11 @@ void usage(int status)
 {
         printf("Usage: %s filename(s)\n", PROGRAM_NAME);
         printf("   or: %s [options]\n\n", PROGRAM_NAME);
-        printf("     --help     display this help and exit\n");
-        printf("     --version  output version information and exit\n");
+        printf("     --help          display this help and exit\n");
+        printf("     --version       output version information and exit\n");
+        printf("     -t [filename]   set template file to [filename]\n");
+        printf("     -p              enable printing logs\n");
+        printf("     -o              rewrite an existing file\n");
         exit(status);
 }
 

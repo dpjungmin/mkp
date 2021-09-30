@@ -26,4 +26,3 @@ clean:
 	-rm -f *.o
 	-rm -f ./include/*.gch
 	-rm -f ./tests/*.gch
-	
