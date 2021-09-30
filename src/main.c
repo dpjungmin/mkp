@@ -3,9 +3,13 @@
 
 int main(int argc, char **argv)
 {
-        int carg, fd, mkp_flags = MKP_DEFAULT;
+        int carg;
+        int fd;
         char *fname;
-        DEFINE_LIST(list);
+        pthread_t *thread;
+        DEFINE_LIST(files);
+        DEFINE_LIST(threads);
+        int mkp_flags = MKP_DEFAULT;
         extern args_t args;
 
         if (argc == 2) {
@@ -34,14 +38,26 @@ int main(int argc, char **argv)
                                 break;
                         }
                 } else {
-                        list_push_back((void *)argv[carg], &list);
+                        list_push_back((void *)argv[carg], &files);
                 }
         }
 
         get_template(&fd);
 
-        while ((fname = list_pop_front(&list)))
-                (void)mkp(fd, fname, mkp_flags);
+        while ((fname = list_pop_front(&files))) {
+                thread = malloc(sizeof(pthread_t));
+                struct mkp_args *ma = malloc(sizeof(struct mkp_args));
+                ma->fd = fd;
+                ma->fname = fname;
+                ma->flags = mkp_flags;
+                pthread_create(thread, NULL, mkp, (void *)ma);
+                list_push_back((void *)thread, &threads);
+        }
+
+        while ((thread = list_pop_front(&threads))) {
+                pthread_join(*thread, NULL);
+                free(thread);
+        }
 
         close(fd);
         return 0;

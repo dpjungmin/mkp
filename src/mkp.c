@@ -1,6 +1,7 @@
 #include "mkp.h"
 
 args_t args = ARGS_INIT;
+pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 
 static inline void __set_template(char **template)
 {
@@ -8,7 +9,7 @@ static inline void __set_template(char **template)
                 *template = args.tfile;
                 return;
         }
-        
+
         if ((*template = getenv(TEMPLATE_ENV)) == NULL)
                 *template = TEMPLATE_DEFAULT;
 }
@@ -73,34 +74,44 @@ void get_template(int *fd)
         __open_template(fd, template);
 }
 
-int mkp(int fd, char *fname, int flags)
-{
-        int fd2, mkp_create = flags & MKP_CREATE;
+void *mkp(void *args)
+{   
+        struct mkp_args *ma = args;
+        const int mkp_create = ma->flags & MKP_CREATE;
+        int fd;
 
-        if (!mkp_create && (fd2 = open(fname, O_WRONLY, S_IRUSR | S_IWUSR)) != -1) {
-                fprintf(stderr, "\"%s\" already exists\n", fname);
-                close(fd2);
-                return -1;
+        if (!mkp_create && (fd = open(ma->fname, O_WRONLY, S_IRUSR | S_IWUSR)) != -1) {
+                fprintf(stderr, "\"%s\" already exists\n", ma->fname);
+                close(fd);
+                pthread_exit(NULL);
         }
 
-        if ((fd2 = open(fname, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR)) == -1) {
-                fprintf(stderr, "Failed to open \"%s\"\n", fname);
-                return -1;
+        if ((fd = open(ma->fname, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR)) == -1) {
+                fprintf(stderr, "Failed to open \"%s\"\n", ma->fname);
+                pthread_exit(NULL);
         }
 
-        if (lseek(fd, (off_t)0, SEEK_SET) == -1) {
-                perror("lseek");
-                exit(EXIT_FAILURE);
-        }
+        pthread_mutex_lock(&m);
+        {
+                if (lseek(ma->fd, (off_t)0, SEEK_SET) == -1) {
+                        perror("lseek");
+                        pthread_mutex_unlock(&m);
+                        exit(EXIT_FAILURE);
+                }
 
-        if (__fcpy(fd2, fd) == -1) {
-                fprintf(stderr, "Failed to copy \"%s\"\n", fname);
-                close(fd2);
-                return -1;
+                if (__fcpy(fd, ma->fd) == -1) {
+                        fprintf(stderr, "Failed to copy \"%s\"\n", ma->fname);
+                        close(fd);
+                        pthread_mutex_unlock(&m);
+                        pthread_exit(NULL);
+                }
         }
+        pthread_mutex_unlock(&m);
 
-        __display("Created \"%s\"\n", fname);
-        close(fd2);
-        return 0;
+        __display("mkp: created \"%s\"\n", ma->fname);
+        close(fd);
+        free(ma);
+
+        return NULL;
 }
 

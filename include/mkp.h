@@ -7,8 +7,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdarg.h>
+#include <pthread.h>
 
 #include "util.h"
+#include "types.h"
 
 #define PROGRAM_NAME      "mkp"
 #define VERSION           "0.0.1"
@@ -30,9 +32,15 @@ typedef struct args {
         { .printflag = FALSE,           \
           .tfile = NULL, }
 
+struct mkp_args {
+        int     fd;
+        char    *fname;
+        int     flags;
+};
+
 extern void usage(int status);
 extern void version(int status);
 extern void get_template(int *fd);
-extern int  mkp(int fd, char *fname, int flags);
+extern void *mkp(void *args);
 
 #endif
